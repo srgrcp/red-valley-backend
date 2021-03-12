@@ -1,0 +1,40 @@
+version: '3'
+services:
+  red-valley-backend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.develop
+    image: red-valley-backend-dev
+    container_name: red-valley-backend-dev   
+    restart: always
+    volumes: 
+      - .:/app/
+      - /app/node_modules
+    ports:
+      - "3040:3040"
+    command: sh -c 'npm run dev'
+    networks:
+      - red-valley-net
+      
+  mongo-db:
+    image: mongo:4.1.8-xenial
+    container_name: mongo-db
+    #restart: unless-stopped
+    ports:
+      - "27017:27017"
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGO_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD
+    volumes:
+      - dbdata:/data/db
+    networks:
+      - red-valley-net
+
+networks:
+  red-valley-net:
+    external: true
+
+volumes:
+  dbdata:
+    driver: local
